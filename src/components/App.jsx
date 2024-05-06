@@ -15,7 +15,7 @@ export const App = () => {
   const [images, setImages] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [modalImageUrl, setModalImageUrl] = useState('');
-  const [previousImages, setPreviousImages] = useState([]); // Dodany stan przechowujący poprzednie wyniki
+  // const [previousImages, setPreviousImages] = useState([]); // Dodany stan przechowujący poprzednie wyniki
 
   useEffect(() => {
     if (query === '') return;
@@ -41,8 +41,9 @@ export const App = () => {
             'Sorry, there are no images matching your search query. Please try again.'
           );
         } else {
-          setImages(newImages);
-          setPreviousImages(prevImages => [...prevImages, ...newImages]); // Aktualizacja poprzednich wyników
+          // setImages(newImages);    // <-- Wyświetla tylko rezultat query, po wcisnięciu load more nadpisuje stare obrazki nowymi
+          setImages(prevImages => [...prevImages, ...newImages]); // <-- Nowo dodane obrazki wyświetlają się pod starymi, włącznie z tymi z świeżego query
+          // setPreviousImages(prevImages => [...prevImages, ...newImages]); // Aktualizacja poprzednich wyników
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -50,6 +51,10 @@ export const App = () => {
         setLoader(false); // Wyłączenie ikonki ładowania
       }
     };
+    if (page === 1) {
+      // <-- Czyści poprzednią galerię jeśli pobierana jest pierwsza strona wyników
+      setImages([]);
+    }
     fetchImages();
   }, [query, page]);
   // Fetch z JS
@@ -83,15 +88,16 @@ export const App = () => {
   };
 
   const handleLoadMore = async () => {
-    setPage(prevPage => prevPage + 1);
+    // setPage(prevPage => prevPage + 1);
+    // setLoader(true); // Włączenie ikonki ładowania
     setLoader(true); // Włączenie ikonki ładowania
-    // try {
-    //   setPage(prevPage => prevPage + 1);
-    // } catch (error) {
-    //   console.error('Error loading more data:', error);
-    //   } finally {
-    //     setLoader(false); // Wyłączenie ikonki ładowania
-    //   }
+    try {
+      setPage(prevPage => prevPage + 1);
+    } catch (error) {
+      console.error('Error loading more data:', error);
+    } finally {
+      setLoader(false); // Wyłączenie ikonki ładowania
+    }
   };
   // loadMore z JS
   // loadMoreBtn.addEventListener('click', async () => {
